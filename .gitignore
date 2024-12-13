@@ -1,0 +1,15 @@
+# Node.js
+/frontend/node_modules/
+/frontend/build/
+
+# Java
+/backend/target/
+/backend/.idea/
+/backend/.classpath
+/backend/.project
+/backend/.settings/
+
+# General
+*.log
+*.DS_Store
+.env
