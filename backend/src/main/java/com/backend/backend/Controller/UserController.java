@@ -26,7 +26,7 @@ public class UserController {
     @PostMapping("/signup")
     public User signup(@RequestBody User user) {
         user = userServices.addUser(user);
-        System.out.println(user.getPassword());
+//        System.out.println(user.getPassword());
         return user;
     }
 }
