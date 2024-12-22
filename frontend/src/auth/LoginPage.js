@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CustomAlert from '../Components/UI/AlertIcon';
 
 const LoginPage = ({ onLoginSuccess = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -59,11 +60,14 @@ const LoginPage = ({ onLoginSuccess = () => {} }) => {
           </h2>
         </div> 
 
-        {/* {error && (
-          <Alert variant="destructive">
-            <AlertTitle>{error}</AlertTitle>
-          </Alert>
-        )} */}
+        {error && (
+          <CustomAlert
+            key={Date.now()}
+            type="error"
+            message={error}
+            onClose={() => console.log("Closed")}
+          />
+        )}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
