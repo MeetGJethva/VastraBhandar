@@ -1,4 +1,6 @@
 export const fetchProducts = async () => {
+  try {
+    
     // In a real app, this would be an API call
     const products = [
         {
@@ -65,38 +67,45 @@ export const fetchProducts = async () => {
           },
           {
             id: 3,
-            name: "Leather Wallet",
-            description: "Genuine leather wallet with multiple card slots",
-            price: 49.99,
-            rating: 4.2,
+              name: "Leather Wallet",
+              description: "Genuine leather wallet with multiple card slots",
+              price: 49.99,
+              rating: 4.2,
             image: "/api/placeholder/200/200"
           }
       // ... more products
     ];
-    return products;
+    return { products, error: null };
+  } catch (error) {
+    return { products: null, error: 'Failed to fetch products' };
+  }
   };
   
   export const filterProducts = (products, filters) => {
-    const { priceRange, rating } = filters;
-    
-    return products
-      .filter(product => {
-        if (priceRange === 'under50') return product.price < 50;
-        if (priceRange === '50to100') return product.price >= 50 && product.price <= 100;
-        if (priceRange === 'over100') return product.price > 100;
-        return true;
-      })
-      .filter(product => {
-        if (rating === '4plus') return product.rating >= 4;
-        if (rating === '3plus') return product.rating >= 3;
-        return true;
-      });
-  };
+    if(!products) return null;
+    return products.filter(product => {
+      // Price filter
+      if (filters.priceRange === 'under50' && product.price >= 50) return false;
+      if (filters.priceRange === '50to100' && (product.price < 50 || product.price > 100)) return false;
+      if (filters.priceRange === 'over100' && product.price <= 100) return false;
   
-  export const sortProducts = (products, sortBy) => {
-    return [...products].sort((a, b) => {
-      if (sortBy === 'price') return a.price - b.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
+      // Rating filter
+      if (filters.rating === '4plus' && product.rating < 4) return false;
+      if (filters.rating === '3plus' && product.rating < 3) return false;
+  
+      return true;
+    }).sort((a, b) => {
+      // Sorting
+      if (filters.sortBy === 'price') return a.price - b.price;
+      if (filters.sortBy === 'rating') return b.rating - a.rating;
       return a.name.localeCompare(b.name);
     });
   };
+  
+  // export const sortProducts = (products, sortBy) => {
+  //   return [...products].sort((a, b) => {
+  //     if (sortBy === 'price') return a.price - b.price;
+  //     if (sortBy === 'rating') return b.rating - a.rating;
+  //     return a.name.localeCompare(b.name);
+  //   });
+  // };
