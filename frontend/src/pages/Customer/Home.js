@@ -26,7 +26,7 @@ const HomePage = () => {
   };
 
   const handleSubcategoryClick = (subcategory) => {
-    navigate(`/category/${subcategory.id}`); // Redirect to subcategory page
+    navigate(`/products?category=${subcategory.id}`); // Redirect to subcategory page
   };
 
   return (

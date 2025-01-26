@@ -40,7 +40,7 @@ export const getCategories = function () {
       title: "Custom Men T-Shirts",
       image: "/api/placeholder/400/400",
       backgroundColor: "bg-gray-200",
-      href: "/category/custom-men-tshirts",
+      href: "/products?category=custom-men-tshirts",
       hasSubcategories: false,
     },
   ];

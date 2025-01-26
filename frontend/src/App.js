@@ -4,6 +4,7 @@ import { ThemeProvider } from "./Theme/ThemeProvider";
 import Header from "./Components/Header/Header";
 import HomePage from "./pages/Customer/Home";
 import ProductPage from "./pages/Customer/Products";
+import CustomeCloth from "./pages/Designer/CustomCloth";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route exact path="/home" element={<HomePage />} />
           <Route exact path="/login" element={<LoginPage />} />
           <Route path="/products" element={<ProductPage/>}/>
+          <Route path="/customize" element={<CustomeCloth/>}/>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
