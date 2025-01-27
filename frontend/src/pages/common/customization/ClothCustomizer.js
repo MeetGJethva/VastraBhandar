@@ -5,8 +5,9 @@ import Canvas from "./Canvas";
 import DesignWrapper from "./DesignWrapper";
 import MoveableWrapper from "./MoveableWrapper";
 import ProductDetails from "./ProductDetails";
+import redT from "../../../assets/images/t-sirts/green.png";
 
-const ClothCustomizer = () => {
+const ClothCustomizer = (props) => {
   const { productId } = useParams();
   const canvasRef = useRef(null);
   const designWrapperRef = useRef(null);
@@ -14,7 +15,7 @@ const ClothCustomizer = () => {
   const [product, setProduct] = useState({
     id: productId,
     name: "Classic T-Shirt",
-    baseImage: "/api/placeholder/400/500",
+    baseImage: redT,
     price: 29.99,
     sizes: ["S", "M", "L", "XL"],
     colors: ["White", "Black", "Gray", "Navy"],
@@ -49,13 +50,15 @@ const ClothCustomizer = () => {
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = (e) => {
+    e.preventDefault();
     const mergedImage = canvasRef.current.toDataURL("image/png");
-    console.log("Order data:", {
+    const order = {
       product,
       customization,
       mergedImage,
-    });
+    };
+    props.onCustomization(order);
   };
 
   return (

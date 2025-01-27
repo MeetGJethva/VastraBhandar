@@ -4,7 +4,7 @@ import { ThemeProvider } from "./Theme/ThemeProvider";
 import Header from "./Components/Header/Header";
 import HomePage from "./pages/Customer/Home";
 import ProductPage from "./pages/Customer/Products";
-import CustomeCloth from "./pages/Designer/CustomCloth";
+import CustomeCloth from "./pages/Customer/CustomCloth";
 
 function App() {
   return (
