@@ -44,7 +44,7 @@ const Canvas = React.forwardRef(({ productBaseImage, customization }, ref) => {
       ref={ref}
       width="400"
       height="500"
-      className="border border-gray-200 dark:border-gray-700"
+      className="border border-gray-600 dark:border-gray-700"
     />
   );
 });
