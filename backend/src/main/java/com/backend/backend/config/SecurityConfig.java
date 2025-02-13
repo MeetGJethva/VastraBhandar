@@ -26,22 +26,24 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf( csrf-> csrf.disable())
-            .authorizeHttpRequests(request -> request
-                    .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
-                    .anyRequest().authenticated())
-            .formLogin(Customizer.withDefaults())
-            .httpBasic(Customizer.withDefaults())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/api/users/signup", "/api/users/login");
+        return http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/users/signup").permitAll()
+                        .requestMatchers("/api/users/login").permitAll()
+                        .requestMatchers("/api/users/").permitAll()
+                        .requestMatchers("/api/vendors/**").hasRole("FACTORY_OWNER")
+                        .requestMatchers("/api/designers/**").hasRole("DESIGNER")
+                        .requestMatchers("/api/customers/**").hasRole("CUSTOMER")
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .build();
     }
 
     @Bean
