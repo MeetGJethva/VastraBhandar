@@ -9,18 +9,45 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Document(collection = "products") // MongoDB collection name
+@Document(collection = "products")
 public class Product {
     @Id
-    private String productId; // MongoDB uses String/ObjectId for IDs
+    private String productId;
 
     private String name;
     private String description;
     private Double price;
     private String imageUrl;
+    private int rating;
 
-    @DBRef // Reference to another document in MongoDB
+    public int getNo_of_ratings() {
+        return no_of_ratings;
+    }
+
+    public void setNo_of_ratings(int no_of_ratings) {
+        this.no_of_ratings = no_of_ratings;
+    }
+
+    private int no_of_ratings;
+    private Double basePrice;
+    @DBRef
     private Category category;
+
+    public int getRating() {
+        return rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public Double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(Double basePrice) {
+        this.basePrice = basePrice;
+    }
 
     @DBRef // Reference to another document in MongoDB
     private User designer;
@@ -31,18 +58,19 @@ public class Product {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    // No-args constructor
     public Product() {
     }
 
-    // All-args constructor (optional, for convenience)
-    public Product(String name, String description, Double price, String imageUrl, Category category, User designer) {
+    public Product(int rating, int no_of_ratings, String name, String description, String imageUrl, Category category, User designer, Double basePrice, Double d_commision) {
         this.name = name;
         this.description = description;
-        this.price = price;
+        this.price = basePrice + d_commision;
         this.imageUrl = imageUrl;
         this.category = category;
         this.designer = designer;
+        this.basePrice = basePrice;
+        this.rating = rating;
+        this.no_of_ratings = no_of_ratings;
     }
 
     public String getProductId() {

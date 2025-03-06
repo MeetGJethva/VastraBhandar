@@ -1,26 +1,25 @@
 package com.backend.backend.models;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDateTime;
 
 @Data
-@Entity
-@Table(name = "statistics")
+@Document(collection = "statistics")
 public class Statistics {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long statId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @DBRef
     private User user;
 
     private Double profit;
     private Integer sales;
 
-    @ManyToOne
-    @JoinColumn(name = "popular_category_id")
+    @DBRef
     private Category popularCategory;
 
     private LocalDateTime createdAt;

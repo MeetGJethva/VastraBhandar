@@ -56,7 +56,7 @@ import java.util.List;
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MyUserDetailsService.class);
+//    private static final Logger logger = LoggerFactory.getLogger(MyUserDetailsService.class);
 
     @Autowired
     private UserRepo userRepo;
@@ -72,8 +72,7 @@ public class MyUserDetailsService implements UserDetailsService {
         String role = "ROLE_"+user.getRole().name();
         authorities.add(new SimpleGrantedAuthority(role));
 
-        // Log the role for debugging
-        logger.info("User {} has role: {}", username, role);
+//        logger.info("User {} has role: {}", username, role);
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

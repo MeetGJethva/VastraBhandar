@@ -13,6 +13,8 @@ public class Category {
     @Id
     private String categoryId;
 
+
+    private byte[] image;
     private String name;
 
     public String getCategoryId() {
@@ -55,6 +57,14 @@ public class Category {
         this.updatedAt = updatedAt;
     }
 
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
     private String description;
 
     @CreatedDate
@@ -66,8 +76,9 @@ public class Category {
     public Category() {
     }
 
-    public Category(String name, String description) {
+    public Category(String name, String description, byte[] img) {
         this.name = name;
         this.description = description;
+        this.image = img;
     }
 }
