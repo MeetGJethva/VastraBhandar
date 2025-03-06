@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export const useQueryFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -8,7 +8,8 @@ export const useQueryFilters = () => {
   const filters = {
     sortBy: searchParams.get('sort') || 'name',
     priceRange: searchParams.get('price') || 'all',
-    rating: searchParams.get('rating') || 'all'
+    rating: searchParams.get('rating') || 'all',
+    category : searchParams.get('category') || 'all'
   };
 
   // Update URL when filters change
@@ -19,6 +20,7 @@ export const useQueryFilters = () => {
     if (newFilters.sortBy !== 'name') params.set('sort', newFilters.sortBy);
     if (newFilters.priceRange !== 'all') params.set('price', newFilters.priceRange);
     if (newFilters.rating !== 'all') params.set('rating', newFilters.rating);
+    if (newFilters.category !== 'all') params.set('category', newFilters.category);
 
     // Update URL without page reload
     setSearchParams(params);

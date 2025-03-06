@@ -19,7 +19,7 @@ export const ProductCard = ({ product, onAddToCart }) => (
         <RatingStars rating={product.rating} />
         <div className="mt-4 flex items-center justify-between">
           <span className="text-xl font-bold text-gray-900 dark:text-white">
-            ${product.price}
+          ₹{product.price}
           </span>
           <button 
             onClick={() => onAddToCart(product)}

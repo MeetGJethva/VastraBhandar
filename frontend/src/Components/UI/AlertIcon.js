@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 
 const AlertIcon = ({ type }) => {
   const iconProps = {
-    width: "20",
-    height: "20",
+    width: "24",
+    height: "24",
     fill: "none",
     viewBox: "0 0 24 24",
     stroke: "currentColor",
@@ -94,6 +94,11 @@ const CustomAlert = ({
     }
   }, [show, duration, onClose]);
 
+  const handleClose = () => {
+    setIsVisible(false);
+    onClose?.();
+  };
+
   if (!isVisible) return null;
 
   const alertStyles = {
@@ -110,30 +115,45 @@ const CustomAlert = ({
     info: 'text-blue-800 dark:text-blue-200'
   };
 
+  const buttonStyles = {
+    success: 'bg-green-600 hover:bg-green-700 text-white',
+    error: 'bg-red-600 hover:bg-red-700 text-white',
+    warning: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+    info: 'bg-blue-600 hover:bg-blue-700 text-white'
+  };
+
   return (
     <div
       role="alert"
-      className={`fixed top-4 right-4 z-50 max-w-md transform transition-all duration-500 ease-in-out
-        ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl transform transition-all duration-500 ease-in-out
+        ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'}
         ${alertStyles[type]} border rounded-lg shadow-lg`}
     >
-      <div className="flex items-start gap-3 p-4">
-        <AlertIcon type={type} />
-        
-        <div className={`flex-1 text-sm ${textStyles[type]}`}>
-          {message}
+      <div className="relative">
+        <div className="flex items-start gap-3 p-6">
+          <AlertIcon type={type} />
+          
+          <div className={`flex-1 text-base ${textStyles[type]}`}>
+            {message}
+          </div>
+
+          <button
+            onClick={handleClose}
+            className={`shrink-0 ${textStyles[type]} opacity-70 hover:opacity-100 transition-opacity`}
+            aria-label="Close alert"
+          >
+            <CloseIcon />
+          </button>
         </div>
 
-        <button
-          onClick={() => {
-            setIsVisible(false);
-            onClose?.();
-          }}
-          className={`shrink-0 ${textStyles[type]} opacity-70 hover:opacity-100 transition-opacity`}
-          aria-label="Close alert"
-        >
-          <CloseIcon />
-        </button>
+        <div className="flex justify-end p-4 pt-0">
+          <button
+            onClick={handleClose}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${buttonStyles[type]} transition-colors duration-200`}
+          >
+            OK
+          </button>
+        </div>
       </div>
     </div>
   );

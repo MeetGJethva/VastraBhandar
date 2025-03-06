@@ -1,6 +1,9 @@
+import { getCategories } from "../../services/customer/category_services";
 import { FilterSelect } from "./FilterSelect";
 
 export const Filters = ({ filters, onFilterChange }) => {
+  const categories = getCategories();
+
   const options = {
     sort: [
       { value: "name", label: "Name" },
@@ -18,13 +21,20 @@ export const Filters = ({ filters, onFilterChange }) => {
       { value: "4plus", label: "4+ Stars" },
       { value: "3plus", label: "3+ Stars" },
     ],
+    category: [
+      { value: "all", label: "All Categories" },
+      ...categories.map(category => ({
+        value: category.name.replaceAll(" ", "-"),
+        label: category.name
+      }))
+    ]
   };
 
   return (
-    <div className="fixed w-[30%] h-screen overflow-y-auto bg-white dark:bg-gray-800 shadow-sm">
-      <div className="p-6">
-        <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">
-          Filters
+    <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+      <div className="flex flex-wrap items-center gap-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mr-2">
+          Filters:
         </h2>
         <FilterSelect
           label="Sort By"
@@ -45,6 +55,12 @@ export const Filters = ({ filters, onFilterChange }) => {
           value={filters.rating}
           options={options.rating}
           onChange={(value) => onFilterChange({ ...filters, rating: value })}
+        />
+        <FilterSelect
+          label="Category"
+          value={filters.category}
+          options={options.category}
+          onChange={(value) => onFilterChange({ ...filters, category: value })}
         />
       </div>
     </div>
