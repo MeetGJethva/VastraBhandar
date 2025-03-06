@@ -7,7 +7,7 @@ const ProductDetails = ({
   customization,
   setCustomization,
   onDesignUpload,
-  onBuyNow,
+  onFinilNow,
 }) => {
   const fileInputRef = useRef(null);
 
@@ -78,11 +78,11 @@ const ProductDetails = ({
 
       {/* Buy Button */}
       <button
-        onClick={onBuyNow}
+        onClick={onFinilNow}
         className="w-full mt-4 px-4 py-2 bg-green-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-green-700"
       >
         <ShoppingCart size={20} />
-        Buy Now - ${product.price}
+        Finilize Design 
       </button>
     </div>
   );
