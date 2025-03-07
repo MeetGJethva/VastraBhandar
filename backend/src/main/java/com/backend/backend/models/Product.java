@@ -17,7 +17,7 @@ public class Product {
     private String name;
     private String description;
     private Double price;
-    private String imageUrl;
+    private byte[] imageUrl;
     private int rating;
 
     public int getNo_of_ratings() {
