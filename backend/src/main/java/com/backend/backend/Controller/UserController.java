@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -28,6 +29,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
+
         try {
             User newUser = userServices.addUser(user);
             System.out.println(newUser);
@@ -44,7 +46,13 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
-            return ResponseEntity.ok().body("Login successful");
+            User user = userServices.getUserByEmail(loginRequest.getEmail());
+            if(user == null ||
+                    !userServices.matchPassword(loginRequest.getPassword(), user.getPassword())) {
+                throw new Exception();
+            }
+
+            return ResponseEntity.ok().body(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }

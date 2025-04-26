@@ -4,53 +4,56 @@ import { AuthContext } from "../../context/auth_context";
 import { Order } from "../../models/Order";
 import { OrderItem } from "../../models/OrderItem";
 import { placeOrder } from "../../services/customer/order_service";
+import CustomAlert from "../../Components/UI/AlertIcon";
 
 const CartManagementPage = () => {
   const { cart, cartItems } = useContext(AuthContext);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  const { userId } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   // Calculate total price
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
 
   const handleRemoveItem = (itemId) => {
     cart.removeItem(itemId);
-    // Force re-render since we modified the cart
-    setIsPlacingOrder((prev) => !prev);
-    setIsPlacingOrder((prev) => !prev);
   };
 
   const handlePlaceOrder = () => {
     setIsPlacingOrder(true);
     // Simulate API call
-    setTimeout(() => {
-      const order = new Order();
-      order.items = [];
-      let total_price = 0;
+    const order = new Order();
+    order.items = [];
+    let total_price = 0;
 
-      cartItems.forEach(function (item, index) {
-        const orderItem = new OrderItem();
-        orderItem.customization = item.customization;
-        orderItem.price = item.price;
-        orderItem.product = item;
-        orderItem.order = order;
-        // orderItem.mergedImage = null; no need as it is included in customization
-        orderItem.quantity = 1; // implement this for dynamic
+    cartItems.forEach(function (item, index) {
+      const orderItem = new OrderItem();
+      orderItem.customization = item.customization;
+      orderItem.customization.baseImage = item.imageUrl;
+      orderItem.price = item.price;
+      // orderItem.mergedImage = null; no need as it is included in customization
+      orderItem.quantity = 1; // implement this for dynamic
 
-        order.items.push(orderItem);
-        total_price += item.price;
+      order.items.push(orderItem);
+      total_price += item.price;
+    });
+
+    order.customer = user;
+    order.totalPrice = total_price;
+    order.status = "PENDING";
+    console.dir(order);
+    placeOrder(order, user)
+      .then((response) => {
+        setMessage("Order Placed Sucessfully");
+        cart.clearCart();
+      })
+      .catch((error) => {
+        setError(error.message || "not placed.");
+      })
+      .finally(() => {
+        setIsPlacingOrder(false);
       });
-
-      order.customer = userId;
-      order.totalPrice = total_price;
-      order.status = "PENDING";
-      placeOrder(order);
-      cart.clearCart();
-
-      alert("Order placed successfully!");
-      setIsPlacingOrder(false);
-      // Here you would typically clear the cart or redirect
-    }, 1500);
   };
 
   return (
@@ -59,7 +62,22 @@ const CartManagementPage = () => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-8">
           Manage Cart
         </h1>
-
+        {error && (
+          <CustomAlert
+            key={Date.now()}
+            type="error"
+            message={error}
+            onClose={() => setError("")}
+          />
+        )}
+        {message && (
+          <CustomAlert
+            key={Date.now()}
+            type="info"
+            message={message}
+            onClose={() => setMessage("")}
+          />
+        )}
         {cartItems.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
             <ShoppingBag className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
@@ -74,10 +92,10 @@ const CartManagementPage = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
               {cartItems.map((product) => (
-                <li key={product.id} className="flex py-6 px-4 md:px-6">
+                <li key={product.productId} className="flex py-6 px-4 md:px-6">
                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 dark:border-gray-700">
                     <img
-                      src={product.image}
+                      src={product.imageUrl}
                       alt={product.name}
                       className="h-full w-full object-cover object-center"
                     />
@@ -103,7 +121,7 @@ const CartManagementPage = () => {
                       </div>
                       <button
                         type="button"
-                        onClick={() => handleRemoveItem(product.id)}
+                        onClick={() => handleRemoveItem(product.productId)}
                         className="flex items-center font-medium text-red-600 dark:text-red-400 hover:text-red-500"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />

@@ -1,4 +1,4 @@
-package com.backend.backend.controllers;
+package com.backend.backend.Controller;
 
 import com.backend.backend.models.Order;
 import com.backend.backend.models.Payment;

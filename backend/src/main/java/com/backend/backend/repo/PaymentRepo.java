@@ -1,6 +1,7 @@
 package com.backend.backend.repo;
 
 import com.backend.backend.models.Payment;
+import com.backend.backend.models.Order;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

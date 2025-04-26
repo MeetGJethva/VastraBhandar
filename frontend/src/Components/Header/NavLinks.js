@@ -1,73 +1,74 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/auth_context";
 
 const NavLinks = () => {
-  const { role } = useContext(AuthContext); // Get role from context
+  const { role } = useContext(AuthContext);
+  const location = useLocation();
+  
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+  
+  const linkClasses = (path) => {
+    return `relative px-1 py-2 text-gray-700 dark:text-gray-200 transition-colors duration-300 ${
+      isActive(path) 
+        ? "font-medium text-blue-600 dark:text-blue-400" 
+        : "hover:text-blue-600 dark:hover:text-blue-400"
+    }`;
+  };
+  
+  const activeLinkIndicator = (
+    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 rounded-full"></span>
+  );
 
   return (
-    <nav className="hidden md:flex space-x-8">
+    <nav className="hidden md:flex items-center space-x-8">
       {/* Public Links */}
-      <Link
-        to="/"
-        className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-      >
+      <Link to="/" className={linkClasses("/")}>
         Home
+        {isActive("/") && activeLinkIndicator}
       </Link>
+      
       {/* Hide Products for Designers */}
-      {role !== "designer" && (
-        <Link to="/products" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
+      {role !== "DESIGNER" && (
+        <Link to="/products" className={linkClasses("/products")}>
           Products
+          {isActive("/products") && activeLinkIndicator}
         </Link>
       )}
 
       {/* Customer-Only Links */}
-      {role === "customer" && (
+      {role === "CUSTOMER" && (
         <>
-          <Link
-            to="/customize"
-            className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-          >
+          <Link to="/customize" className={linkClasses("/customize")}>
             Customize
+            {isActive("/customize") && activeLinkIndicator}
           </Link>
-          <Link
-            to="/orders"
-            className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-          >
+          <Link to="/orders" className={linkClasses("/orders")}>
             Orders
-          </Link>
-          <Link
-            to="/cart"
-            className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-          >
-            Cart
+            {isActive("/orders") && activeLinkIndicator}
           </Link>
         </>
       )}
 
       {/* Designer-Only Links */}
-      {role === "designer" && (
+      {role === "DESIGNER" && (
         <>
-          <Link
-            to="/designerCustomize"
-            className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-          >
+          <Link to="/designerCustomize" className={linkClasses("/designerCustomize")}>
             Customize
+            {isActive("/designerCustomize") && activeLinkIndicator}
           </Link>
-          <Link
-            to="/myProducts"
-            className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-          >
+          <Link to="/myProducts" className={linkClasses("/myProducts")}>
             My Products
+            {isActive("/myProducts") && activeLinkIndicator}
           </Link>
         </>
       )}
 
-      <Link
-        to="/about"
-        className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400"
-      >
+      <Link to="/about" className={linkClasses("/about")}>
         About
+        {isActive("/about") && activeLinkIndicator}
       </Link>
     </nav>
   );

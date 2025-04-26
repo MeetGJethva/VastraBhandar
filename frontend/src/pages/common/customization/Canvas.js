@@ -11,7 +11,7 @@ const Canvas = React.forwardRef(({ productBaseImage, customization }, ref) => {
 
     const clothImage = new Image();
     clothImage.src = productBaseImage;
-    console.log("Product base image" + productBaseImage);
+    
     clothImage.onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(clothImage, 0, 0, canvas.width, canvas.height);

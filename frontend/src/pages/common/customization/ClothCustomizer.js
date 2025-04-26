@@ -7,6 +7,7 @@ import MoveableWrapper from "./MoveableWrapper";
 import ProductDetails from "./ProductDetails";
 import { fetchCustomizerProducts } from "../../../services/customer/customization_product";
 import { ProductSelector } from "./ProductSelector";
+import CustomAlert from "../../../Components/UI/AlertIcon";
 
 // Dynamically load all images from the folder
 const imagesContext = require.context(
@@ -26,6 +27,7 @@ const ClothCustomizer = (props) => {
   const { productId } = useParams();
   const canvasRef = useRef(null);
   const designWrapperRef = useRef(null);
+  const [error, setError] = useState("");
 
   const [products] = useState(fetchCustomizerProducts());
 
@@ -37,10 +39,11 @@ const ClothCustomizer = (props) => {
     designSize: { width: 100, height: 100 },
     rotation: 0,
     scale: [1, 1],
+    designUrl: "",
   });
 
   const [product, setProduct] = useState({
-    id: productId,
+    id: "67e4f84810072e939c7dcf16",
     name: "Classic T-Shirt",
     baseImage: colorImageMap[customization.color],
     price: 29.99,
@@ -82,6 +85,15 @@ const ClothCustomizer = (props) => {
     // Ensure the canvas is updated before capturing
     setTimeout(() => {
       const mergedImage = canvasRef.current.toDataURL("image/png");
+      if (
+        customization.designImage == null ||
+        customization.designImage.currentSrc == null
+      ) {
+        setError("upload a design to finalize a design");
+        return;
+      }
+      customization.designUrl = customization.designImage.currentSrc; // convert useer uploaded design into base64 encoded form
+
       const order = {
         product,
         customization,
@@ -95,6 +107,14 @@ const ClothCustomizer = (props) => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+      {error && (
+        <CustomAlert
+          key={Date.now()}
+          type="error"
+          message={error}
+          onClose={() => setError("")}
+        />
+      )}
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 relative z-0">

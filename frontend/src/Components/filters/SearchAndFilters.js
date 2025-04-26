@@ -1,8 +1,9 @@
+import { useContext, useEffect, useState } from "react";
 import { getCategories } from "../../services/customer/category_services";
-
+import { AuthContext } from "../../context/auth_context";
 export const SearchAndFilters = ({ searchTerm, onSearchChange, filters, onFilterChange }) => {
-  const categories = getCategories();
-
+  const [categories, setCategories] = useState([]); // Default to an empty array
+  const {user}= useContext(AuthContext);
   const options = {
     sort: [
       { value: "name", label: "Name" },
@@ -11,9 +12,9 @@ export const SearchAndFilters = ({ searchTerm, onSearchChange, filters, onFilter
     ],
     price: [
       { value: "all", label: "All Prices" },
-      { value: "under50", label: "Under $50" },
-      { value: "50to100", label: "$50 - $100" },
-      { value: "over100", label: "Over $100" },
+      { value: "under50", label: "Under 50" },
+      { value: "50to100", label: "50 - 100" },
+      { value: "over100", label: "Over 100" },
     ],
     rating: [
       { value: "all", label: "All Ratings" },
@@ -23,11 +24,21 @@ export const SearchAndFilters = ({ searchTerm, onSearchChange, filters, onFilter
     category: [
       { value: "all", label: "All Categories" },
       ...categories.map(category => ({
-        value: category.name.replaceAll(" ", "-"),
+        value: category.name,
         label: category.name
       }))
     ]
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const fetchedCategories = await getCategories(user); // Fetch categories from API
+      // console.log("Fetched categories:", fetchedCategories);
+      setCategories(fetchedCategories); // Set categories in state
+    };
+
+    fetchCategories(); // Call the fetch function once
+  }, [user]);
 
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">

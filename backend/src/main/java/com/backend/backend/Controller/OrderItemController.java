@@ -1,4 +1,4 @@
-package com.backend.backend.controllers;
+package com.backend.backend.Controller;
 
 import com.backend.backend.models.Order;
 import com.backend.backend.models.OrderItem;
@@ -28,9 +28,9 @@ public class OrderItemController {
     }
 
     @GetMapping("/product/{productId}")
-    public List<OrderItem> getOrderItemsByProduct(@PathVariable Product product) {
-        return orderItemService.getOrderItemsByProduct(product);
-    }
+//    public List<OrderItem> getOrderItemsByProduct(@PathVariable Product product) {
+//        return orderItemService.getOrderItemsByProduct(product);
+//    }
 
     @PostMapping
     public OrderItem createOrderItem(@RequestBody OrderItem orderItem) {
@@ -38,7 +38,7 @@ public class OrderItemController {
     }
 
     @DeleteMapping("/{orderItemId}")
-    public ResponseEntity<Void> deleteOrderItem(@PathVariable Long orderItemId) {
+    public ResponseEntity<Void> deleteOrderItem(@PathVariable String orderItemId) {
         orderItemService.deleteOrderItem(orderItemId);
         return ResponseEntity.noContent().build();
     }

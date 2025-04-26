@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import { X, Minus, Plus, ShoppingCart } from "lucide-react";
 
-const ConfirmationModal = ({ isOpen, onClose, orderData, onFinilization }) => {
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  orderData,
+  onFinilization,
+  isOrderProcessing,
+}) => {
   const [quantity, setQuantity] = useState(1);
 
   if (!isOpen) return null;
@@ -18,7 +24,6 @@ const ConfirmationModal = ({ isOpen, onClose, orderData, onFinilization }) => {
 
   const handleSubmit = () => {
     onFinilization({ quantity, totalPrice });
-    onClose();
   };
 
   return (
@@ -51,7 +56,7 @@ const ConfirmationModal = ({ isOpen, onClose, orderData, onFinilization }) => {
             {/* Preview Image */}
             <div className="flex justify-center items-center bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
               <img
-                src={product.customization.mergedImage}
+                src={product.customization.baseImage}
                 alt="Customized Product"
                 className="max-w-full h-auto rounded shadow-sm"
               />
@@ -131,10 +136,15 @@ const ConfirmationModal = ({ isOpen, onClose, orderData, onFinilization }) => {
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center gap-2"
+            disabled={isOrderProcessing}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-lg flex items-center justify-center gap-2 ${
+              isOrderProcessing
+                ? "bg-blue-500 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             <ShoppingCart className="w-4 h-4" />
-            Place Order
+            {isOrderProcessing ? "Processing" : "Place Order"}
           </button>
         </div>
       </div>

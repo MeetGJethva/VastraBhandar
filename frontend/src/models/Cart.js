@@ -42,7 +42,7 @@ export class Cart {
   }
 
   removeItem(itemId) {
-    this.orderItems = this.orderItems.filter((item) => item.id !== itemId);
+    this.orderItems = this.orderItems.filter((item) => item.productId !== itemId);
     // Update localStorage with the modified array
     localStorage.setItem("cart", JSON.stringify(this.orderItems));
     this.notifyListeners();
@@ -57,5 +57,9 @@ export class Cart {
 
   getItems() {
     return this.initializeList();
+  }
+
+  getNumberOfItems(){
+    return this.orderItems.length;
   }
 }

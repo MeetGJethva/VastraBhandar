@@ -31,4 +31,14 @@ public class UserServices {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
+
+    public User getUserByEmail(String email) {
+        User user = userRepo.findByEmail(email).get();
+//        user.setPassword(passwordEncoder.);
+        return user;
+    }
+
+    public boolean matchPassword(String givenPassword, String actualPassword) {
+        return passwordEncoder.matches(givenPassword, actualPassword);
+    }
 }

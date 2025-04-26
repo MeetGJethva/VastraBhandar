@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderRepo extends MongoRepository<Order, Long> {
+public interface OrderRepo extends MongoRepository<Order, String> {
     // Custom query methods can be added here
     List<Order> findByCustomer(User customer);
     List<Order> findByStatus(Order.Status status);

@@ -1,53 +1,54 @@
+import { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { ProductList } from "../../Components/UI/ProductList";
 import { useQueryFilters } from "../../hooks/useQueryFilters";
-import { filterProducts } from "../../services/customer/product_service";
 import { useProducts } from "../../hooks/useProducts";
 import { AuthContext } from "../../context/auth_context";
-import { useContext, useState } from "react";
 import CustomAlert from "../../Components/UI/AlertIcon";
 import { SearchAndFilters } from "../../Components/filters/SearchAndFilters";
 import LoadingSpinner from "../../Components/LoadingSpinner";
+import { filterProducts } from "../../services/customer/product_service";
 
 const ProductPage = () => {
-  const { products, loading, error } = useProducts();
   const [filters, updateFilters] = useQueryFilters();
-  const { cart } = useContext(AuthContext);
+  const { cart, user } = useContext(AuthContext);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [alertType, setAlertType] = useState("success");
+  const [page, setPage] = useState(0);
 
-  // Loading state
-  if (loading) {
-    return (
-      <LoadingSpinner/>
-    );
-  }
+  const { products, loading, error, hasMore } = useProducts(user, page, 10);
+  const observer = useRef(); // Ref for infinite scrolling
 
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <div className="text-xl text-red-600 dark:text-red-400">
-          Error: {error}
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setPage(0); // Reset pagination when filters or search term changes
+  }, [filters, searchTerm]);
+
+  // Intersection Observer for infinite scrolling
+  const lastProductRef = useCallback(
+    (node) => {
+      if (loading || !hasMore) return;
+
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1); // Load next page
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
   let filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase())
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  // Apply filters to products
   filteredProducts = filterProducts(filteredProducts, filters);
 
   function handleAddToCart(product_item) {
-    // Implement cart functionality
     cart.addItem(product_item);
-
-    // Show alert when item is added
     setShowAlert(true);
     setAlertMessage(
       `${product_item.name || "Item"} added to cart successfully!`
@@ -57,7 +58,7 @@ const ProductPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200 p-4">
-      {/* Combined Search and Filters */}
+      {/* Search and Filters */}
       <SearchAndFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -66,11 +67,33 @@ const ProductPage = () => {
       />
 
       {/* Product List */}
-      <div className="w-full">
+      <div
+        className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4"
+        style={{
+          overflowY: "auto",
+          height: "80vh",
+          scrollbarWidth: "none" /* Firefox */,
+          msOverflowStyle: "none" /* IE and Edge */,
+          "&::-webkit-scrollbar": {
+            display: "none",
+          } /* Chrome, Safari, newer versions of Opera */,
+        }}
+      >
         <ProductList
           products={filteredProducts}
           onAddToCart={handleAddToCart}
+          lastProductRef={lastProductRef}
+          Loading={loading}
         />
+        {/* Attach the ref to the last product */}
+        {hasMore && <div ref={lastProductRef} style={{ height: "20px" }}></div>}
+
+        {/* Loading Spinner at Bottom */}
+        {loading && (
+          <div className="flex justify-center my-4">
+            <LoadingSpinner />
+          </div>
+        )}
       </div>
 
       <CustomAlert
