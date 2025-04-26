@@ -6,12 +6,12 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import ProductPrice from "./ProductPrice";
 import ProductCustomization from "./ProductCustomization";
 
-const ProductCard = ({ 
-  product, 
-  onEdit, 
-  onDeleteConfirm, 
-  isConfirmingDelete, 
-  onDelete 
+const ProductCard = ({
+  product,
+  onEdit,
+  onDeleteConfirm,
+  isConfirmingDelete,
+  onDelete,
 }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform hover:shadow-lg">
@@ -19,7 +19,7 @@ const ProductCard = ({
         <img
           src={product.customization.mergedImage || product.imageUrl}
           alt={product.name}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
         <div className="absolute top-2 right-2 flex space-x-2">
           <button
@@ -53,12 +53,15 @@ const ProductCard = ({
           {product.description}
         </p>
 
-        <ProductCustomization 
-          color={product.customization.color} 
-          size={product.customization.size} 
+        <ProductCustomization
+          color={product.customization.color}
+          size={product.customization.size}
         />
-        
-        <ProductRating rating={product.rating} ratingCount={product.ratingCount} />
+
+        <ProductRating
+          rating={product.rating}
+          ratingCount={product.ratingCount}
+        />
 
         <div className="flex items-center justify-between">
           <ProductPrice basePrice={product.basePrice} price={product.price} />

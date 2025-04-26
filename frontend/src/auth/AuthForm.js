@@ -3,7 +3,7 @@ import CustomAlert from "../Components/UI/AlertIcon";
 import { AuthContext } from "../context/auth_context";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
-const AuthForm = ({ onLoginSuccess = () => {} }) => {
+const AuthForm = () => {
   const { login, signup } = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +21,7 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
+    role: "customer",
     password: "",
     confirmPassword: "",
   });
@@ -53,19 +54,29 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
 
     try {
       if (isLogin) {
-        await login(loginData);
-        onLoginSuccess();
+        const response = await login(loginData);
+        if (!response.success) {
+          throw new Error(response.message);
+        }
       } else {
         // Check if passwords match
         if (signupData.password !== signupData.confirmPassword) {
           throw new Error("Passwords do not match");
         }
-        await signup(signupData);
+        const response = await signup(signupData);
+
+        if (!response.success) {
+          throw new Error(response.message);
+        }
+
         // Auto switch to login after successful signup
         toggleForm();
       }
     } catch (err) {
-      setError(err.message || `${isLogin ? "Login" : "Signup"} failed. Please try again.`);
+      setError(
+        err.message ||
+          `${isLogin ? "Login" : "Signup"} failed. Please try again.`
+      );
     } finally {
       setLoading(false);
     }
@@ -73,7 +84,7 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
 
   const toggleForm = () => {
     setTransitioning(true);
-    
+
     // Wait for content to slide out completely
     setTimeout(() => {
       setIsLogin(!isLogin);
@@ -93,8 +104,8 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
             <button
               onClick={() => !isLogin && !transitioning && toggleForm()}
               className={`w-1/2 py-4 px-6 text-center font-medium focus:outline-none transition-colors duration-300 ${
-                isLogin 
-                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400" 
+                isLogin
+                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
@@ -103,8 +114,8 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
             <button
               onClick={() => isLogin && !transitioning && toggleForm()}
               className={`w-1/2 py-4 px-6 text-center font-medium focus:outline-none transition-colors duration-300 ${
-                !isLogin 
-                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400" 
+                !isLogin
+                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
@@ -132,7 +143,10 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
             <div className="min-h-64">
               {/* Login Form */}
               {isLogin && !transitioning && (
-                <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-6 animate-fade-in"
+                >
                   <div className="space-y-4">
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -186,12 +200,18 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
                         type="checkbox"
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
-                      <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="remember-me"
+                        className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+                      >
                         Remember me
                       </label>
                     </div>
                     <div className="text-sm">
-                      <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                      <a
+                        href="#"
+                        className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                      >
                         Forgot password?
                       </a>
                     </div>
@@ -209,7 +229,10 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
 
               {/* Signup Form */}
               {!isLogin && !transitioning && (
-                <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-6 animate-fade-in"
+                >
                   <div className="space-y-4">
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -241,6 +264,27 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
                         value={signupData.email}
                         onChange={handleSignupChange}
                       />
+                    </div>
+
+                    <div className="relative mb-4">
+                      <label
+                        htmlFor="role"
+                        className="block text-sm font-medium text-gray-400 dark:text-gray-300 mb-1"
+                      >
+                        Select your role
+                      </label>
+                      <select
+                        name="role"
+                        id="role"
+                        required
+                        className="block w-full rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white py-3 px-4"
+                        value={signupData.role || "customer"}
+                        onChange={handleSignupChange}
+                      >
+                        <option value="customer">Customer</option>
+                        <option value="designer">Designer</option>
+                        <option value="factory_owner">Factory Owner</option>
+                      </select>
                     </div>
 
                     <div className="relative">
@@ -287,7 +331,9 @@ const AuthForm = ({ onLoginSuccess = () => {} }) => {
                       <button
                         type="button"
                         className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-5 w-5 text-gray-400" />

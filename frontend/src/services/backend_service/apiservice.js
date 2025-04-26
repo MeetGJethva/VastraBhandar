@@ -1,7 +1,12 @@
 import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../../context/auth_context";
 
-// Base API URL from environment variables
-// const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+// Helper function to create Basic Auth header
+const getBasicAuthHeader = (username, password) => {
+  const base64Credentials = btoa(`${username}:${password}`);
+  return { Authorization: `Basic ${base64Credentials}` };
+};
 
 /**
  * Generic function to make API calls with proper error handling.
@@ -10,10 +15,15 @@ import axios from "axios";
  * @param {Object} [data] - Request body (for POST, PUT).
  * @param {Object} [params] - URL parameters (for GET).
  * @param {Object} [headers] - Custom headers if needed.
+ * @param {string} [username] - Username for Basic Auth.
+ * @param {string} [password] - Password for Basic Auth.
  * @returns {Promise<Object>} - API response data or error message.
  */
-const apiRequest = async (endpoint, method = "GET", data = null, params = {}, headers = {}) => {
+const apiRequest = async (endpoint, method = "GET", data = null, params = {}, headers = {}, username, password) => {
   try {
+    // Add Basic Auth header if username and password are provided
+    const authHeader = username && password ? getBasicAuthHeader(username, password) : {};
+
     const response = await axios({
       url: `${endpoint}`,
       method,
@@ -22,27 +32,28 @@ const apiRequest = async (endpoint, method = "GET", data = null, params = {}, he
       headers: {
         "Content-Type": "application/json",
         ...headers, // Allow custom headers if needed
+        ...authHeader, // Add the Basic Auth header here
       },
+      withCredentials: true,
     });
 
-    return response.data; // Return API response data
-
+    return response; // Return API response 
   } catch (error) {
     console.error(`❌ API Error (${method} ${endpoint}):`, error.response || error.message);
 
     // Return meaningful error response
     return {
       success: false,
-      message: error.response?.data?.message || "Something went wrong. Please try again.",
+      message: error.response?.data || "Something went wrong. Please try again.",
       status: error.response?.status || 500,
     };
   }
 };
 
 // ✅ Export specific methods for readability
-export const apiGet = (endpoint, params = {}, headers = {}) => apiRequest(endpoint, "GET", null, params, headers);
-export const apiPost = (endpoint, data, headers = {}) => apiRequest(endpoint, "POST", data, {}, headers);
-export const apiPut = (endpoint, data, headers = {}) => apiRequest(endpoint, "PUT", data, {}, headers);
-export const apiDelete = (endpoint, headers = {}) => apiRequest(endpoint, "DELETE", null, {}, headers);
+export const apiGet = (endpoint, params = {}, headers = {}, username, password) => apiRequest(endpoint, "GET", null, params, headers, username, password);
+export const apiPost = (endpoint, data, headers = {}, username, password) => apiRequest(endpoint, "POST", data, {}, headers, username, password);
+export const apiPut = (endpoint, data, headers = {}, username, password) => apiRequest(endpoint, "PUT", data, {}, headers, username, password);
+export const apiDelete = (endpoint, headers = {}, username, password) => apiRequest(endpoint, "DELETE", null, {}, headers, username, password);
 
 export default apiRequest;

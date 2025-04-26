@@ -23,15 +23,21 @@ public class OrderItemService {
         return orderItemRepo.findByOrder(order);
     }
 
-    public List<OrderItem> getOrderItemsByProduct(Product product) {
-        return orderItemRepo.findByProduct(product);
-    }
+//    public List<OrderItem> getOrderItemsByProduct(Product product) {
+//        return orderItemRepo.findByProduct(product);
+//    }
 
     public OrderItem createOrderItem(OrderItem orderItem) {
-        return orderItemRepo.save(orderItem);
+        OrderItem o = null;
+        try{
+            o = orderItemRepo.save(orderItem);
+        }catch (Exception e){
+            System.out.println("Order Item Service: " + e.getMessage());
+        }
+        return o;
     }
 
-    public void deleteOrderItem(Long orderItemId) {
+    public void deleteOrderItem(String orderItemId) {
         orderItemRepo.deleteById(orderItemId);
     }
 }

@@ -25,7 +25,7 @@ const ManageProductsPage = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-  const { userId } = useContext(AuthContext);
+  const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Fetch products on component mount
@@ -33,7 +33,7 @@ const ManageProductsPage = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const productsList = await getProductByCreator(userId);
+        const productsList = await getProductByCreator(user);
         setProducts(productsList);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -41,15 +41,15 @@ const ManageProductsPage = () => {
         setLoading(false);
       }
     };
-
-    fetchProducts();
-  }, [userId]);
+    if(!authLoading)
+      fetchProducts();
+  }, [user]);
 
   // Handle product deletion
   const handleDeleteProduct = async (productId) => {
     try {
       const productToDelete = products.find((p) => p.productId === productId);
-      await deleteProduct(productToDelete);
+      await deleteProduct(productToDelete.productId, user);
       setProducts(products.filter((p) => p.productId !== productId));
       setConfirmDeleteId(null);
     } catch (error) {
@@ -66,7 +66,7 @@ const ManageProductsPage = () => {
   // Handle product update
   const handleUpdateProduct = async (updatedProductData) => {
     try {
-      const updatedProduct = await updateProduct(updatedProductData);
+      const updatedProduct = await updateProduct(updatedProductData, user);
       setProducts(
         products.map((p) =>
           p.productId === updatedProduct.productId ? updatedProduct : p
@@ -134,7 +134,7 @@ const ManageProductsPage = () => {
       ) : sortedProducts.length === 0 ? (
         <EmptyState
           hasSearchTerm={!!searchTerm}
-          onCreateProduct={() => navigate("/customize")}
+          onCreateProduct={() => navigate("/designerCustomize")}
         />
       ) : (
         <ProductGrid

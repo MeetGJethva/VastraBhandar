@@ -8,7 +8,8 @@ export class Product {
     basePrice,
     imageUrl,
     customization,
-    creator, 
+    creator,
+    category, 
     rating
   ) {
     this.productId = productId; // Unique ID for the product
@@ -19,6 +20,7 @@ export class Product {
     this.imageUrl = imageUrl; // Image URL of the product
     this.customization = customization;
     this.creator = creator; // Creator of the product 
+    this.category = category;
     this.rating = rating; // Rating of the product
   }
 }

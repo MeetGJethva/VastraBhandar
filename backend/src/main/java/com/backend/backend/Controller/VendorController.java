@@ -2,25 +2,39 @@ package com.backend.backend.Controller;
 
 import com.backend.backend.models.Category;
 import com.backend.backend.models.Product;
+import com.backend.backend.models.User;
 import com.backend.backend.services.CategoryService;
 import com.backend.backend.services.ProductServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/api/vendors")
 public class VendorController {
 
-    @Autowired
     private ProductServices productService;
 
+    @Autowired
+    public VendorController(ProductServices services){
+        productService = services;
+    }
+
     @GetMapping("/products")
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<List<Product>> getProducts(@RequestParam int page, @RequestParam int size) {
+        List<Product> products = productService.getProductsPaginated(page, size);
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS).cachePublic())
+                .body(products);
     }
 
     @GetMapping("/product/{id}")
@@ -29,19 +43,35 @@ public class VendorController {
         return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("products/user")
+    public ResponseEntity<?> getProductsByDesigner(@RequestBody User designer){
+        try{
+            List<Product> products = productService.getProductsByDesigner(designer);
+            return ResponseEntity.status(HttpStatus.OK).body(products);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
+    }
+
     @PostMapping("/product")
-    public Product addProduct(@RequestBody Product product) {
-        return productService.addProduct(product);
+    public ResponseEntity<?> addProduct(@RequestBody Product product) {
+        try{
+            Product addedProduct = productService.addProduct(product);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     // 4. Update: Update an existing product by ID
     @PutMapping("/product/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody Product productDetails) {
+    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody Product productDetails) {
         try {
             Product updatedProduct = productService.updateProduct(id, productDetails);
-            return ResponseEntity.ok(updatedProduct);
+            return ResponseEntity.status(HttpStatus.OK).body(updatedProduct);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -57,8 +87,12 @@ public class VendorController {
     private CategoryService categoryService;
 
     @GetMapping("/categories")
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> list = categoryService.getAllCategories();
+        if(list == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     // Get category by ID

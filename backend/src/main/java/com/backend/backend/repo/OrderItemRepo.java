@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderItemRepo extends MongoRepository<OrderItem, Long> {
+public interface OrderItemRepo extends MongoRepository<OrderItem, String> {
     // Custom query methods can be added here
     List<OrderItem> findByOrder(Order order);
-    List<OrderItem> findByProduct(Product product);
+//    List<OrderItem> findByProduct(Product product);
 }

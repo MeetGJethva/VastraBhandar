@@ -1,9 +1,11 @@
-package com.backend.backend.controllers;
+package com.backend.backend.Controller;
 
 import com.backend.backend.models.Order;
 import com.backend.backend.models.User;
 import com.backend.backend.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,15 +24,15 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
+    public ResponseEntity<Order> getOrderById(@PathVariable String orderId) {
         return orderService.getOrderById(orderId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/customer/{customerId}")
-    public List<Order> getOrdersByCustomer(@PathVariable User customer) {
-        return orderService.getOrdersByCustomer(customer);
+    @GetMapping("/customer/{email}")
+    public List<Order> getOrdersByCustomer(@PathVariable String email) {
+        return orderService.getOrdersByCustomer(email);
     }
 
     @GetMapping("/status/{status}")
@@ -39,14 +41,20 @@ public class OrderController {
     }
 
     @PostMapping("/customer/order")
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.createOrder(order);
+    public ResponseEntity<?> createOrder(@RequestBody Order order) {
+        try{
+            Order o = orderService.createOrder(order);
+            return ResponseEntity.status(HttpStatus.CREATED).body(o);
+        } catch (Exception e) {
+            System.out.println("Order Controller: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     //change the status of order by vendor
     @PutMapping("/vendor/{orderId}/status")
     public ResponseEntity<Order> updateOrderStatus(
-            @PathVariable Long orderId,
+            @PathVariable String orderId,
             @RequestParam Order.Status status) {
         try {
             Order updatedOrder = orderService.updateOrderStatus(orderId, status);
@@ -57,8 +65,14 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId) {
-        orderService.deleteOrder(orderId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteOrder(@PathVariable String orderId) {
+        try{
+            orderService.deleteOrder(orderId);
+            return ResponseEntity.noContent().build();
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
     }
 }
